@@ -83,7 +83,8 @@ def mainscreen(row,s):
     def deposit():
         load()
         amount=askinteger("Deposit","Amount to Deposit")
-
+        if(amount==None):
+            return
         if(amount<=0):
             messagebox.showwarning("Negative Amount","Amount should be greater than 0")
             return
@@ -99,7 +100,8 @@ def mainscreen(row,s):
     def withdraw():
         load()
         amount=askinteger("Withdraw","Amount to Withdraw")
-
+        if(amount==None):
+            return
         if(amount<=0):
             messagebox.showwarning("Negative Amount", "Amount should be greater than 0")
             return
@@ -178,7 +180,7 @@ def mainscreen(row,s):
     f.resizable(0,0)
     f.title("Main Menu")
     f.protocol("WM_DELETE_WINDOW",False)
-    
+
     Label(f,text=("Welcome "+ sheet.cell_value(row,1)).upper(),font=("Times New Roman",15),fg="Blue").place(anchor=CENTER,x=300,y=20)
     Button(f,text="DEPOSIT",width=15,height=4,command=deposit).place(x=150,y=80)
     Button(f,text="WITHDRAW",width=15,height=4,command=withdraw).place(x=350,y=80)
@@ -222,7 +224,7 @@ def createAcc(s):
                 wsheet.write(rows,2,amt)
                 wsheet.write(rows,3,p)
                 wb.save('customers_data.xls')
-                messagebox.showinfo("Info","Account Details Saved\nYour Account Number : {}".format(nac),parent=f)
+                messagebox.showinfo("Info","Account Details Saved\nYour Account Number : {}".format(int(nac)),parent=f)
                 load()
                 with open("log.txt",'a') as fil:
                     fil.write(str(datetime.now().strftime("[%d-%m-%Y %H:%M:%S]"))+ " New User "+ str(nac)+ " with balance "+str(sheet.cell_value(sheet.nrows-1,2))+"\n")
