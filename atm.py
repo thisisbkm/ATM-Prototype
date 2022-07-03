@@ -23,9 +23,9 @@ def start(f):
                 psd = int(passwd.get())
             except:
                 messagebox.showwarning("Warning","Account Number and Pin must be Integers")
-            for i in range(sheet.nrows):
-                if(sheet.cell_value(i,0)==acn):
-                    if(sheet.cell_value(i,3)==psd):
+            for i in range(1,sheet.nrows):
+                if(int(sheet.cell_value(i,0))==acn):
+                    if(int(sheet.cell_value(i,3))==psd):
                         accNo.delete(0,END)
                         passwd.delete(0,END)
                         mainscreen(i,f)
@@ -88,13 +88,13 @@ def mainscreen(row,s):
         if(amount<=0):
             messagebox.showwarning("Negative Amount","Amount should be greater than 0")
             return
-        with open("log.txt",'a') as fil:
+        with open("/media/bkm/F014230D1422D67E/MACHINE LEARNING-TECHVANTO/ATM-PROTOTYPE/log.txt",'a') as fil:
             fil.write(str(datetime.now().strftime("[%d-%m-%Y %H:%M:%S] ")) + str(int(sheet.cell_value(row,0)))+ " deposited "+str(amount)+"\n")
         amount+=sheet.cell_value(row,2)
         wb=copy(book)
         wsheet = wb.get_sheet(0)
         wsheet.write(row,2,amount)
-        wb.save('customers_data.xls')
+        wb.save('/media/bkm/F014230D1422D67E/MACHINE LEARNING-TECHVANTO/ATM-PROTOTYPE/customers_data.xls')
         messagebox.showinfo("","Amount Deposited Successfully\n Current Balance {}".format(amount))
     
     def withdraw():
@@ -114,8 +114,8 @@ def mainscreen(row,s):
         wb=copy(book)
         wsheet = wb.get_sheet(0)
         wsheet.write(row,2,balance-amount)
-        wb.save('customers_data.xls')
-        with open("log.txt",'a') as fil:
+        wb.save('/media/bkm/F014230D1422D67E/MACHINE LEARNING-TECHVANTO/ATM-PROTOTYPE/customers_data.xls')
+        with open("/media/bkm/F014230D1422D67E/MACHINE LEARNING-TECHVANTO/ATM-PROTOTYPE/log.txt",'a') as fil:
             fil.write(str(datetime.now().strftime("[%d-%m-%Y %H:%M:%S] ")) + str(int(sheet.cell_value(row,0)))+ " withdrawed "+str(amount)+"\n")
         messagebox.showinfo("","Amount Withdrawn Successfully\n Current Balance {}".format(balance-amount))
     
@@ -142,34 +142,34 @@ def mainscreen(row,s):
         wb=copy(book)
         wsheet = wb.get_sheet(0)
         wsheet.write(row,3,int(newpin))
-        wb.save('customers_data.xls')
+        wb.save('/media/bkm/F014230D1422D67E/MACHINE LEARNING-TECHVANTO/ATM-PROTOTYPE/customers_data.xls')
         messagebox.showinfo("","Pin Change Successful !")
         load()
 
     def mtransfer():
         load()
         acno = askinteger("Transfer", "Enter Account Number To Transfer")
-        if(acno==sheet.cell_value(row,0)):
+        if(acno==int(sheet.cell_value(row,0))):
             messagebox.showwarning("","You can't transfer to Your account !")
             return
 
-        for i in range(sheet.nrows):
-            if(sheet.cell_value(i,0)==acno):
+        for i in range(1,sheet.nrows):
+            if(int(sheet.cell_value(i,0))==acno):
                 amt = askinteger("Transfer","Enter amount you wish to transfer")
                 if(amt==None):
                     return
-                if(amt>sheet.cell_value(row,2)):
+                if(amt>int(sheet.cell_value(row,2))):
                     messagebox.showerror("Insufficient Funds","Your account don't have enough balance")
                 elif(amt>0):
                     if(messagebox.askyesno("Confirmation", "Are you sure to transfer ?")):
                         wb=copy(book)
                         wsheet=wb.get_sheet(0)
-                        wsheet.write(i,2,sheet.cell_value(i,2)+amt)
-                        wsheet.write(row,2,sheet.cell_value(row,2)-amt)
-                        wb.save('customers_data.xls')
+                        wsheet.write(i,2,int(sheet.cell_value(i,2))+amt)
+                        wsheet.write(row,2,int(sheet.cell_value(row,2))-amt)
+                        wb.save('/media/bkm/F014230D1422D67E/MACHINE LEARNING-TECHVANTO/ATM-PROTOTYPE/customers_data.xls')
                         load()
                         messagebox.showinfo("Transfer","Amount Transferred Successfully !")
-                        with open("log.txt",'a') as fil:
+                        with open("/media/bkm/F014230D1422D67E/MACHINE LEARNING-TECHVANTO/ATM-PROTOTYPE/log.txt",'a') as fil:
                             fil.write(str(datetime.now().strftime("[%d-%m-%Y %H:%M:%S] ")) + str(int(sheet.cell_value(row,0)))+ " transferred "+str(amt)+" to "+str(int(sheet.cell_value(i,0)))+"\n")
                         return
         if(acno!=None):
@@ -179,7 +179,6 @@ def mainscreen(row,s):
     f.geometry("600x600")
     f.resizable(0,0)
     f.title("Main Menu")
-    f.protocol("WM_DELETE_WINDOW",False)
 
     Label(f,text=("Welcome "+ sheet.cell_value(row,1)).upper(),font=("Times New Roman",15),fg="Blue").place(anchor=CENTER,x=300,y=20)
     Button(f,text="DEPOSIT",width=15,height=4,command=deposit).place(x=150,y=80)
@@ -203,13 +202,11 @@ def createAcc(s):
         if(not(name.get() and pin.get() and rpin.get() and amount.get())):
             messagebox.showinfo("Info","All Feilds are Mandatory !!",parent=f)
             return
-        
 
         try:
             p=int(pin.get())
             rp=int(rpin.get())
             amt = int(amount.get())
-
             if(p!=rp):
                 messagebox.showerror("Error","Pin Don't Match",parent=f)
             elif(len(pin.get())!=4):
@@ -218,19 +215,19 @@ def createAcc(s):
                 wb=copy(book)
                 wsheet = wb.get_sheet(0)
                 rows = sheet.nrows
-                nac=sheet.cell_value(sheet.nrows-1,0)+1
+                nac=int(sheet.cell_value(rows-1,0))+1
                 wsheet.write(rows,0,int(nac))
                 wsheet.write(rows,1,name.get())
-                wsheet.write(rows,2,amt)
-                wsheet.write(rows,3,p)
-                wb.save('customers_data.xls')
+                wsheet.write(rows,2,int(amt))
+                wsheet.write(rows,3,int(p))
+                wb.save('/media/bkm/F014230D1422D67E/MACHINE LEARNING-TECHVANTO/ATM-PROTOTYPE/customers_data.xls')
                 messagebox.showinfo("Info","Account Details Saved\nYour Account Number : {}".format(int(nac)),parent=f)
                 load()
-                with open("log.txt",'a') as fil:
+                with open("/media/bkm/F014230D1422D67E/MACHINE LEARNING-TECHVANTO/ATM-PROTOTYPE/log.txt",'a') as fil:
                     fil.write(str(datetime.now().strftime("[%d-%m-%Y %H:%M:%S]"))+ " New User "+ str(nac)+ " with balance "+str(sheet.cell_value(sheet.nrows-1,2))+"\n")
                 f.destroy()
                 s.deiconify()
-        
+    
         except Exception as e:
             print(e)
             messagebox.showwarning("Warning","Pin and Amount should be Integers",parent=f)
@@ -239,7 +236,7 @@ def createAcc(s):
     f.grab_set()
     f.geometry("500x400")
     f.resizable(0,0)
-    f.protocol("WM_DELETE_WINDOW",False)
+    f.protocol("WM_DELETE_WINDOW",lambda:(f.destroy(),s.deiconify()))
     f.title("Create Account")
     f.bind("<Return>",addEntry)
 
@@ -267,7 +264,7 @@ def createAcc(s):
         f,text="Clear",
         activebackground="Red",activeforeground="White",
         background="Red",foreground="White",
-        command=lambda:name.delete(0,END) and pin.delete(0,END) and rpin.delete(0,END) and amount.delete(0,END)
+        command=lambda:(name.delete(0,END), pin.delete(0,END), rpin.delete(0,END), amount.delete(0,END),amount.insert(0,0))
         ).place(anchor=CENTER,x=200,y=200)
     
     Button(f,text="Cancel",activebackground="Yellow",background="Yellow",command=lambda:(f.destroy(), s.deiconify())).place(anchor=CENTER,x=430,y=350)
