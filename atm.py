@@ -1,4 +1,5 @@
 import xlrd
+from os.path import abspath
 import xlwt
 from time import sleep
 from xlutils.copy import copy
@@ -7,10 +8,11 @@ from tkinter import messagebox
 from tkinter.simpledialog import askinteger
 from tkinter.simpledialog import askstring
 from datetime import datetime
-
+DATA = abspath('customers_data.xls')
+LOG = abspath("log.txt")
 def load():
     global book
-    book=xlrd.open_workbook("/media/bkm/F014230D1422D67E/MACHINE LEARNING-TECHVANTO/ATM-PROTOTYPE/customers_data.xls")
+    book=xlrd.open_workbook(DATA)
     global sheet
     sheet=book.sheet_by_index(0)  
       
@@ -66,7 +68,7 @@ def start(f):
         f,text="Clear",
         activebackground="Red",activeforeground="White",
         background="Red",foreground="White",
-        command=lambda:accNo.delete(0,END) and passwd.delete(0,END)
+        command=lambda:(accNo.delete(0,END), passwd.delete(0,END))
         ).place(x=250,y=250)
 
     Button(
@@ -88,13 +90,13 @@ def mainscreen(row,s):
         if(amount<=0):
             messagebox.showwarning("Negative Amount","Amount should be greater than 0")
             return
-        with open("/media/bkm/F014230D1422D67E/MACHINE LEARNING-TECHVANTO/ATM-PROTOTYPE/log.txt",'a') as fil:
+        with open(LOG,'a') as fil:
             fil.write(str(datetime.now().strftime("[%d-%m-%Y %H:%M:%S] ")) + str(int(sheet.cell_value(row,0)))+ " deposited "+str(amount)+"\n")
         amount+=sheet.cell_value(row,2)
         wb=copy(book)
         wsheet = wb.get_sheet(0)
         wsheet.write(row,2,amount)
-        wb.save('/media/bkm/F014230D1422D67E/MACHINE LEARNING-TECHVANTO/ATM-PROTOTYPE/customers_data.xls')
+        wb.save(DATA)
         messagebox.showinfo("","Amount Deposited Successfully\n Current Balance {}".format(amount))
     
     def withdraw():
@@ -114,8 +116,8 @@ def mainscreen(row,s):
         wb=copy(book)
         wsheet = wb.get_sheet(0)
         wsheet.write(row,2,balance-amount)
-        wb.save('/media/bkm/F014230D1422D67E/MACHINE LEARNING-TECHVANTO/ATM-PROTOTYPE/customers_data.xls')
-        with open("/media/bkm/F014230D1422D67E/MACHINE LEARNING-TECHVANTO/ATM-PROTOTYPE/log.txt",'a') as fil:
+        wb.save(DATA)
+        with open(LOG,'a') as fil:
             fil.write(str(datetime.now().strftime("[%d-%m-%Y %H:%M:%S] ")) + str(int(sheet.cell_value(row,0)))+ " withdrawed "+str(amount)+"\n")
         messagebox.showinfo("","Amount Withdrawn Successfully\n Current Balance {}".format(balance-amount))
     
@@ -142,7 +144,7 @@ def mainscreen(row,s):
         wb=copy(book)
         wsheet = wb.get_sheet(0)
         wsheet.write(row,3,int(newpin))
-        wb.save('/media/bkm/F014230D1422D67E/MACHINE LEARNING-TECHVANTO/ATM-PROTOTYPE/customers_data.xls')
+        wb.save(DATA)
         messagebox.showinfo("","Pin Change Successful !")
         load()
 
@@ -166,10 +168,10 @@ def mainscreen(row,s):
                         wsheet=wb.get_sheet(0)
                         wsheet.write(i,2,int(sheet.cell_value(i,2))+amt)
                         wsheet.write(row,2,int(sheet.cell_value(row,2))-amt)
-                        wb.save('/media/bkm/F014230D1422D67E/MACHINE LEARNING-TECHVANTO/ATM-PROTOTYPE/customers_data.xls')
+                        wb.save(DATA)
                         load()
                         messagebox.showinfo("Transfer","Amount Transferred Successfully !")
-                        with open("/media/bkm/F014230D1422D67E/MACHINE LEARNING-TECHVANTO/ATM-PROTOTYPE/log.txt",'a') as fil:
+                        with open(LOG,'a') as fil:
                             fil.write(str(datetime.now().strftime("[%d-%m-%Y %H:%M:%S] ")) + str(int(sheet.cell_value(row,0)))+ " transferred "+str(amt)+" to "+str(int(sheet.cell_value(i,0)))+"\n")
                         return
         if(acno!=None):
@@ -220,10 +222,10 @@ def createAcc(s):
                 wsheet.write(rows,1,name.get())
                 wsheet.write(rows,2,int(amt))
                 wsheet.write(rows,3,int(p))
-                wb.save('/media/bkm/F014230D1422D67E/MACHINE LEARNING-TECHVANTO/ATM-PROTOTYPE/customers_data.xls')
+                wb.save(DATA)
                 messagebox.showinfo("Info","Account Details Saved\nYour Account Number : {}".format(int(nac)),parent=f)
                 load()
-                with open("/media/bkm/F014230D1422D67E/MACHINE LEARNING-TECHVANTO/ATM-PROTOTYPE/log.txt",'a') as fil:
+                with open(LOG,'a') as fil:
                     fil.write(str(datetime.now().strftime("[%d-%m-%Y %H:%M:%S]"))+ " New User "+ str(nac)+ " with balance "+str(sheet.cell_value(sheet.nrows-1,2))+"\n")
                 f.destroy()
                 s.deiconify()
